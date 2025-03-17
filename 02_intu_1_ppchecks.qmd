@@ -1,0 +1,369 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# intuitions, part 1 {background-image="resources/images/bedpeople.png" background-size="60%" background-position="bottom right"}
+
+## a funky example
+
+```{r, results='hide'}
+# xdata <- read.csv("intu2.csv")
+set.seed(21293)
+mu <- -4
+n <- 5
+ageeff <- 0.6
+predvals <- round(runif(n, 0, 6), 1)
+y <- rpois(n, exp(mu + ageeff * predvals))
+(xdata <- data.frame(age = predvals, noffspring = y))
+```
+
+
+::: {style="font-size: 0.8em"}
+
+- goal: estimate the relationship between age and number of offspring 
+
+::: 
+. . .
+
+::: {style="font-size: 0.8em"}
+- our data:
+
+```{r}
+knitr::kable(xdata)
+```
+
+:::
+
+. . .
+
+::: {style="font-size: 0.8em"}
+- in case you wondered: the minimum sample size in the Bayesian world is 1
+:::
+
+
+## prior predictive simulation
+
+```{r prior_check_1, fig.width=4, fig.height=2.3, fig.align='center', out.width="25%", fig.dpi=600, include=FALSE, fig.path="figures/"}
+set.seed(1)
+plot(0, 0, xlim = c(0, 6), ylim = c(0, 10), type = "n", xlab = "age", ylab = "n offspring", cex.axis = 0.8) 
+xvals <- seq(0, 6, by = 0.01)
+for (i in 1:50) {
+  points(xvals, exp(rnorm(1, 0, 20) + rnorm(1, 0, 20) * xvals), type = "l", lwd = 0.7)
+}
+```
+
+
+
+::: {.fragment fragment-index=1 .incremental style="font-size: 0.8em"}
+- emulate a frequentist model, equivalent to
+  - pretending we have no clue what values parameters have
+  - intercept flat (normal(mean = 0, sd = 20))
+  - slope flat (normal(mean = 0, sd = 20))
+:::
+
+
+:::{.columns}
+::: {.column width="60%" .fragment fragment-index=2}
+![](figures/prior_check_1-1.png){.fragment}
+:::
+
+::: {.column width="40%" .fragment}
+&nbsp;
+
+- plausible?
+:::
+:::
+
+
+## prior versus posterior
+
+- even so, we can learn things (update our state of knowledge)
+
+```{r, results='hide'}
+mi2 <- cmdstanr::cmdstan_model("stan_files/intu2a.stan")  
+d <- list(nobs = nrow(xdata), age = xdata$age, noffspring = xdata$noffspring)
+r <- mi2$sample(data = d,
+                seed = 1, refresh = 0)
+post_int <- density(c(r$draws("intercept", format = "draws_matrix")))
+prior_int <- density(c(r$draws("intercept_prior", format = "draws_matrix")))
+post_age <- density(c(r$draws("ageslope", format = "draws_matrix")))
+prior_age <- density(c(r$draws("ageslope_prior", format = "draws_matrix")))
+```
+
+
+:::{.columns}
+
+::: {.column width="50%"  .fragment}
+
+```{r prior_check1_withdata1, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600, fig.path="figures/"}
+ymax <- max(post_int$y, prior_int$y)
+# par(mgp = c(1.1, 0.35, 0), mar = c(2.5, 2.5, 1, 1), family = "serif")
+plot(0, 0, "n", xlim = c(-20, 20), ylim = c(0, ymax * 1.05), yaxs = "i", xaxs = "i", axes = FALSE, ann = FALSE)
+title(xlab = "intercept", ylab = 'density')
+axis(1, cex.axis = 0.8)
+legend("topright", pch = 15, legend = c("prior", "posterior"), bty = "n", cex = 0.8, pt.cex = 1.3,
+       col = c(adjustcolor("#808080", 0.5), adjustcolor("#FFD700", 0.5)))
+
+polygon(prior_int, col = adjustcolor("#808080", 0.5))
+polygon(post_int, col = adjustcolor("#FFD700", 0.5))
+```
+
+::: {.fragment}
+- very little support for a positive intercept
+:::
+
+:::
+
+
+::: {.column width="50%" .fragment}
+
+```{r prior_check1_withdata2, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600, fig.path="figures/"}
+ymax <- max(post_age$y, prior_age$y)
+# par(mgp = c(1.1, 0.35, 0), mar = c(2.5, 2.5, 1, 1), family = "serif")
+plot(0, 0, "n", xlim = c(-20, 20), ylim = c(0, ymax * 1.05), yaxs = "i", xaxs = "i", axes = FALSE, ann = FALSE)
+title(xlab = "age slope", ylab = 'density')
+axis(1, cex.axis = 0.8)
+legend("topright", pch = 15, legend = c("prior", "posterior"), bty = "n", cex = 0.8, pt.cex = 1.3,
+       col = c(adjustcolor("#808080", 0.5), adjustcolor("#F5191C", 0.5)))
+
+polygon(prior_age, col = adjustcolor("#808080", 0.5))
+polygon(post_age, col = adjustcolor("#F5191C", 0.5))
+```
+
+::: {.fragment}
+- positive slope more plausible than a negative slope
+:::
+:::
+:::
+
+
+## prior simulation, 2nd attempt
+
+- surely, we can do better
+
+. . .
+
+- intercept: 
+  - must be close to observed mean 
+
+. . .
+
+- slope:
+  - must be positive
+  - shouldn't allow implausibly large offspring numbers[^gfsghsd]
+
+. . .
+
+[^gfsghsd]: if we think about females in a generic large primate: more than one offspring year is rare
+
+
+## prior simulation, 2nd attempt
+
+- this looks much more reasonable than before
+
+
+```{r prior_check_2, fig.width=4, fig.height=2.3, fig.align='center', out.width="25%", fig.dpi=600, fig.path="figures/"}
+set.seed(1)
+plot(0, 0, xlim = c(0, 6), ylim = c(0, 10), type = "n", xlab = "age", ylab = "n offspring", cex.axis = 0.8) 
+xvals <- seq(0, 6, by = 0.01)
+for (i in 1:20) {
+  points(xvals, exp(rnorm(1, -1.5, 2) + rnorm(1, 0.5, 0.5) * xvals), type = "l", lwd = 0.7)
+}
+```
+
+
+- still room for improvement
+
+
+
+## how does the fit look like?
+
+```{r, results='hide'}
+mi2b <- cmdstanr::cmdstan_model("stan_files/intu2b.stan")  
+# d <- list(nobs = nrow(xdata), age = xdata$age, noffspring = xdata$noffspring)
+r2 <- mi2b$sample(data = d,
+                 seed = 1, refresh = 0)
+post_int <- density(c(r2$draws("intercept", format = "draws_matrix")))
+prior_int <- density(c(r2$draws("intercept_prior", format = "draws_matrix")))
+post_age <- density(c(r2$draws("ageslope", format = "draws_matrix")))
+prior_age <- density(c(r2$draws("ageslope_prior", format = "draws_matrix")))
+```
+
+
+```{r prior_check2_withdata1, fig.retina=2, fig.width=4, fig.height=2.3, include=FALSE, fig.dpi=600, fig.path="figures/"}
+ymax <- max(post_int$y, prior_int$y)
+# par(mgp = c(1.1, 0.35, 0), mar = c(2.5, 2.5, 1, 1), family = "serif")
+plot(0, 0, "n", xlim = c(-20, 20), ylim = c(0, ymax * 1.05), yaxs = "i", xaxs = "i", axes = FALSE, ann = FALSE)
+title(xlab = "intercept", ylab = 'density')
+axis(1, cex.axis = 0.8)
+legend("topright", pch = 15, legend = c("prior", "posterior"), bty = "n", cex = 0.8, pt.cex = 1.3,
+       col = c(adjustcolor("#808080", 0.5), adjustcolor("#FFD700", 0.5)))
+
+polygon(prior_int, col = adjustcolor("#808080", 0.5))
+polygon(post_int, col = adjustcolor("#FFD700", 0.5))
+```
+
+```{r prior_check2_withdata2, fig.retina=2, fig.width=4, fig.height=2.3, include=FALSE, fig.dpi=600, fig.path="figures/"}
+ymax <- max(post_age$y, prior_age$y)
+# par(mgp = c(1.1, 0.35, 0), mar = c(2.5, 2.5, 1, 1), family = "serif")
+plot(0, 0, "n", xlim = c(-20, 20), ylim = c(0, ymax * 1.05), yaxs = "i", xaxs = "i", axes = FALSE, ann = FALSE)
+title(xlab = "age slope", ylab = 'density')
+axis(1, cex.axis = 0.8)
+legend("topright", pch = 15, legend = c("prior", "posterior"), bty = "n", cex = 0.8, pt.cex = 1.3,
+       col = c(adjustcolor("#808080", 0.5), adjustcolor("#F5191C", 0.5)))
+
+polygon(prior_age, col = adjustcolor("#808080", 0.5))
+polygon(post_age, col = adjustcolor("#F5191C", 0.5))
+```
+
+
+:::{.columns}
+::: {.column width="50%"}
+::: {.fragment fragment-index=1}
+```{r, echo=FALSE}
+knitr::include_graphics("figures/prior_check2_withdata1-1.png")
+```
+:::
+::: {.fragment fragment-index=2}
+```{r, echo=FALSE}
+knitr::include_graphics("figures/prior_check1_withdata1-1.png")
+```
+:::
+:::
+::: {.column width="50%"}
+::: {.fragment fragment-index=3}
+```{r, echo=FALSE}
+knitr::include_graphics("figures/prior_check2_withdata2-1.png")
+```
+:::
+::: {.fragment fragment-index=4}
+```{r, echo=FALSE}
+knitr::include_graphics("figures/prior_check1_withdata2-1.png")
+```
+:::
+:::
+:::
+
+
+
+
+
+## posterior simulations and checks
+
+::: {style="font-size: 0.8em"}
+- goal: critiquing my model *after fitting*
+
+- there is no recipe book (that's a blessing and a curse)
+
+- do it by 'random effect level', by sex, by age class, ....
+:::
+
+```{r}
+post <- r$draws("noffspring_rep", format = "draws_matrix")
+```
+
+```{r, fig.retina=2, fig.width=6, fig.height=4, fig.align='center', out.width="50%", fig.dpi=600}
+# x=xdata$noffspring
+# range=0:7
+myhist <- function(x, range = 0:7, ylim = c(0, 5)) {
+  p <- table(factor(x, levels = range))
+  plot(0, 0, "n", xlim = range(range) + c(-0.5, 0.5), xaxs = "i", ylim = ylim, xlab = "", ylab = "", yaxs = "i", bty = "l")
+  h <- as.numeric(names(p))
+  rect(h - 0.5, 0, xright = h + 0.5, ytop = p, col = "lightgrey")
+}
+set.seed(1)
+# myhist(xdata$noffspring, range = 0:7, ylim = c(0, 5))
+par(mfrow = c(3, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+
+myhist(xdata$noffspring, range = 0:7, ylim = c(0, 5))
+box(lwd = 3, col = "red", which = "figure")
+
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+myhist(post[sample(nrow(post), 1), ], range = 0:7, ylim = c(0, 5))
+o <- par()$mar
+par(mar = c(3, 3, 1, 1))
+myhist(rep(0, 5), range = 0:7, ylim = c(0, 5))
+title(xlab = "n offspring", ylab = "frequency", cex.lab = 1.5)
+# reset
+par(mfrow = c(1, 1), mar = o)
+```
+
+
+## posterior simulations and checks
+
+> Choosing good summary statistics is more an art than a science.^[@schad2021]
+
+- use any test statistic we desire
+
+- max number of offspring:
+
+  - our model would be bad if it habitually predicted offspring numbers in the 100's or beyond
+  
+  - others: range, min, mean
+
+## posterior simulations and checks
+
+
+:::{.columns}
+
+::: {.column width="50%"  .fragment}
+
+```{r, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600}
+
+myhist(apply(post, 1, max), range = 0:10, ylim = c(0, 2100))
+title(xlab = "n offspring (max per draw)", ylab = "frequency")
+abline(v = 1, lwd = 2, col = 'red')
+
+```
+
+::: {.fragment}
+
+- model performance with respect to test statistic
+
+:::
+
+:::
+
+
+::: {.column width="50%" .fragment}
+
+```{r, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600}
+plot(xdata$age, xdata$noffspring, xlim = c(0, 6), xaxs = "i", ylim = c(0, 5), yaxs = "i",
+     xlab = "age", ylab = "n offspring", type = "n")
+xvals <- seq(0, 6, by = 0.05)
+
+b0 <- c(r$draws("intercept", format = "draws_matrix"))
+b1 <- c(r$draws("ageslope", format = "draws_matrix"))
+
+for (i in 1:20) {
+  sel <- sample(length(b0), 1)
+  points(xvals, exp(b0[sel] + b1[sel] * xvals), type = "l", lwd = 0.5, col = "grey")
+}
+
+points(xdata$age, xdata$noffspring, pch = 16, cex = 2, xpd = TRUE)
+points(xvals, exp(median(b0) + median(b1) * xvals), type = "l", lwd = 3, lty = 2)
+
+```
+
+::: {.fragment}
+
+- posterior predictions
+
+:::
+:::
+:::
+
+

@@ -1,0 +1,148 @@
+# intuitions, part 3 {background-image="resources/images/flute.png" background-size="40%" background-position="bottom right"}
+
+## random slopes
+
+
+```{r, results='hide'}
+set.seed(1)
+cov <- matrix(c(0.5, 0.6, 0.6, 1), ncol = 2)
+blups <- MASS::mvrnorm(7, mu = c(0, 0), Sigma = lme4::sdcor2cov(cov), empirical = TRUE)
+# cor(blups)
+rownames(blups) <- letters[1:nrow(blups)]
+
+b0 <- -1
+b1 <- 0.5
+
+xdata <- data.frame(id = rownames(blups), mating_season = rep(c(0, 1), each = nrow(blups)))
+lp <- b0 + blups[xdata$id, 1] + (b1 + blups[xdata$id, 2]) * xdata$mating_season
+xdata$noffspring <- rpois(nrow(xdata), exp(lp))
+
+stilllooking <- TRUE
+while(stilllooking) {
+  temp <- xdata[sample(nrow(xdata), nrow(xdata) * 0.66), ]
+  if (length(table(temp$id)) == length(table(xdata$id))) {
+    stilllooking <- FALSE
+    xdata <- temp
+  } 
+}
+xdata <- xdata[order(xdata$id), ]
+rownames(xdata) <- NULL
+
+d <- list(n = nrow(xdata), 
+          n_ids = length(unique(xdata$id)), 
+          idx_id = as.integer(as.factor(xdata$id)),
+          mating_season = xdata$mating_season,
+          noffspring = xdata$noffspring)
+names(d$idx_id) <- xdata$id
+m <- cmdstanr::cmdstan_model("stan_files/illu1.stan")
+r <- m$sample(data = d, refresh = 0, seed = 1)
+
+
+```
+
+
+
+## random slopes
+
+`noffspring ~ mating_season + (mating_season|id)`
+
+
+:::{.columns}
+
+::: {.column width="50%"  .fragment}
+```{r}
+# knitr::kable(xdata, )
+kable_styling(knitr::kable(xdata), font_size = 20)
+```
+:::
+
+
+::: {.column width="50%"}
+
+::: {.fragment .incremental}
+
+- `lme4` won't even try
+
+- `glmmTMB` will moan, but do it
+
+- `brms` with defaults will do it and also moan a little
+
+:::
+:::
+:::
+
+. . .
+
+- priors to the rescue
+
+## random slopes
+
+- setting priors fairly tight here (for demonstration)
+
+```{r r, fig.retina=2, fig.width=6, fig.height=3.4, fig.align='center', out.width="90%", fig.dpi=600}
+dplot <- function(pr, po) {
+  xlim <- range(c(range(pr), range(po)))
+  pr <- density(pr)
+  po <- density(po)
+  ymax <- max(pr$y, po$y) * 1.05
+  plot(0, 0, xlim = xlim, ylim = c(0, ymax), yaxs = "i", type = "n", xlab = "", ylab = "", axes = FALSE)
+  axis(1)
+  polygon(pr, col = grey(0.5, 0.5), lwd = 2)
+  polygon(po, col = adjustcolor("gold", 0.7), lwd = 2)
+  box(bty = "l")
+}
+
+par(cex.axis = 0.8)
+par(mfrow = c(2, 3))
+
+xx <- r$draws(c("intercept", "intercept_prior"), format = "draws_matrix")
+dplot(pr = xx[, 2], po = xx[, 1])
+title(xlab = "intercept", cex.lab = 1.5)
+abline(v = -1, col = "red", lwd = 2)
+
+xx <- r$draws(c("slope", "slope_prior"), format = "draws_matrix")
+dplot(pr = xx[, 2], po = xx[, 1])
+title(xlab = "slope", cex.lab = 1.5)
+abline(v = 0.5, col = "red", lwd = 2)
+
+plot(0,0, "n", axes = FALSE, ann = FALSE)
+text(-0.5, 0.3, "prior", col = "darkgrey", adj = 0, font = 2)
+text(-0.5, 0, "posterior", col = "gold", adj = 0, font = 2)
+text(-0.5, -0.3, "true value", col = "red", adj = 0, font = 2)
+
+xx <- r$draws(c("sds[1]", "sds_prior[1]"), format = "draws_matrix")
+dplot(pr = xx[, 2], po = xx[, 1])
+title(xlab = "SD varying intercepts", cex.lab = 1.5)
+abline(v = 0.5, col = "red", lwd = 2)
+
+xx <- r$draws(c("sds[2]", "sds_prior[2]"), format = "draws_matrix")
+dplot(pr = xx[, 2], po = xx[, 1])
+title(xlab = "SD varying slopes", cex.lab = 1.5)
+abline(v = 1, col = "red", lwd = 2)
+
+xx <- r$draws(c("cor_val", "cor_prior"), format = "draws_matrix")
+dplot(pr = xx[, 2], po = xx[, 1])
+title(xlab = "correlation", cex.lab = 1.5)
+abline(v = 0.6, col = "red", lwd = 2)
+```
+
+
+## if your model can't fit the data
+
+- it's the wrong model...
+
+. . .
+
+- simulation is your friend
+
+. . .
+
+- if you can't simulate the data you can't model the data
+
+. . .
+
+- small data sets often comprise little information -> priors really matter here
+
+. . .
+
+(this is was an extreme example...)

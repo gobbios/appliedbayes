@@ -1,0 +1,107 @@
+---
+title: "A primer on applied Bayesian modelling"
+author: "Christof Neumann"
+date: "2025-02-28"
+format: 
+  revealjs:
+    theme: solarized
+    slide-number: true
+    css: resources/styles.css
+bibliography: 'resources/refs.bib'
+editor_options: 
+  chunk_output_type: console
+knitr:
+  opts_knit:
+    global.par: TRUE
+  opts_chunk: 
+    collapse: true
+    comment: "#>" 
+---
+
+# showcases {background-image="resources/images/hundeklo.png" background-size="60%" background-position="bottom right"}
+
+## do we need Bayes for everything?
+
+- ~~yes~~no[^strt]
+
+. . .
+
+- we don't need a chainsaw to cut the birthday cake
+
+. . .
+
+- but there are a lot of trees that need cutting
+
+
+[^strt]: but it wouldn't hurt
+
+## where do Bayesian models really shine?
+
+:::{.columns}
+
+::: {.column width="60%"  .fragment }
+
+::: {style="font-size: 0.8em"}
+
+- analysis for network data (multimembership models, SRM)
+- propagating uncertainty
+- measurement error models
+- misclassification
+- non-linear models
+- latent variables
+- custom models aka full Bayesian luxury
+- ...
+
+:::
+:::
+
+
+::: {.column width="40%"}
+
+```{r, fig.align='center'}
+knitr::include_graphics("resources/images/onedoesnotsimplypermute.jpg")
+```
+
+:::
+:::
+
+
+
+
+## where do Bayesian models really shine?
+
+::: {style="font-size: 0.6em"}
+transfer of food through groups/audiences of varying sizes
+
+  - dyadic relationship strength ('measurement is uncertain')
+  - individual propensities to interact ('measurement is uncertain')
+  - what predicts audience size and composition
+  - what predicts food transfer target given the audience composition
+:::
+
+. . . 
+
+::: {style="font-size: 0.6em"}
+the effect of relationship strength and dominance rank on greetings
+
+  - dyadic relationships ('measurement is uncertain')
+  - individual dominance rank ('measurement is uncertain')
+  - role of individual features wrt vocal signalling during approaches
+  - role of dyadic features wrt vocal signalling during approaches
+  - role of dyadic features and signalling wrt outcomes of approaches
+:::
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@ohearn2024</div>
+
+## summary 
+
+- Bayesian methods have a lot of intuitive features
+
+- more computationally demanding (most of the time)
+
+- the underlying machinery shares a lot with frequentist methods
+
+- a high degree of flexibility 
+
+- the effort of getting into it is well worth it, I think
+

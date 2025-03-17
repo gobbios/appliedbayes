@@ -1,0 +1,50 @@
+# prior vs posterior {background-image="resources/images/better-git-it.png" background-size="50%" background-position="bottom right"}
+
+## prior vs posterior
+
+- if there is no information in the data, you will get the prior back as posterior
+
+. . .
+
+- but only if the prior is not diffuse or flat...
+
+. . .
+
+- the prior can 'overwhelm' the data
+
+. . .
+
+- the data can overwhelm the prior too
+
+## prior vs posterior
+
+```{r, echo=FALSE, eval=FALSE}
+library(shiny)
+runApp("resources/app.R", port = 1234)
+
+```
+
+
+
+
+<div id="posterior_shiny"; style="transform: scale(0.9); transform-origin: top left%;">
+<iframe id = "shiny-frame" src="http://127.0.0.1:1234" width="150%" height="800px"></iframe>
+</div>
+
+<p id="fallback-message" style="display: none; color: red;">
+  🚨 if nothing appears here you forgot to start the shiny app, duh 🚨
+</p>
+
+<script>
+  window.onload = function () {
+    var iframe = document.getElementById("shiny-frame");
+
+    setTimeout(function () {
+      if (!iframe.contentWindow || iframe.contentWindow.location.href === "about:blank") {
+        document.getElementById("posterior_shiny").style.display = "none";
+        document.getElementById("fallback-message").style.display = "block";
+      }
+    }, 1000); // Wait 1 second before checking
+  };
+</script>
+

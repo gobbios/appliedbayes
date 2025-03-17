@@ -1,0 +1,18 @@
+.reveal .slide-number {
+  left: 50px !important;  /* Moves the number to the left */
+  bottom: 50px !important;  /* Moves the number to the left */
+  right: auto !important; /* Prevents default right alignment */
+  right: auto !important;   /* Prevents default right alignment */
+  font-size: 1em !important;  /* Increases font size */
+  font-weight: bold;  /* Makes the number stand out */
+  font-family: Times New Roman;
+}
+
+
+.top-right-image {
+  position: absolute;
+  top: 10px;   /* Adjust distance from the top */
+  right: 10px; /* Adjust distance from the right */
+  width: 150px; /* Set width (adjust as needed) */
+  height: auto; /* Maintain aspect ratio */
+}

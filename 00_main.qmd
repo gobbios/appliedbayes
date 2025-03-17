@@ -1,0 +1,84 @@
+---
+title: "A primer on applied Bayesian modelling"
+subtitle: https://github.com/gobbios/appliedbayes
+author: 
+  name: "Christof Neumann"
+  affiliation: "German Primate Center"
+  email: christofneumann1@gmail.com
+date: "2025-03-18"
+format: 
+  revealjs:
+    theme: solarized
+    slide-number: true
+    css: resources/styles.css
+bibliography: 'resources/refs.bib'
+editor_options: 
+  chunk_output_type: console
+knitr:
+  opts_knit:
+    global.par: TRUE
+  opts_chunk: 
+    collapse: true
+    comment: "#>" 
+---
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      eval = TRUE,
+                      global.par = TRUE,
+                      fig.align = "center",
+                      fig.retina=2
+)
+library(kableExtra)
+knitr::opts_knit$set(global.par = TRUE)
+par(mgp = c(1.1, 0.35, 0), mar = c(2.5, 2.5, 1, 1), family = "serif", tcl = -0.2, las = 1)
+par(bg = NA)
+
+f = "#F5191C"
+m = "#3B99B1"
+```
+
+# outline
+
+- some background
+
+- intuitions and examples
+
+- outlook
+
+
+```{r, eval = TRUE, echo=FALSE, child = '01_bayesian_huh.qmd'}
+```
+
+```{r, eval = TRUE, echo=FALSE, child = '02_intu_1_ppchecks.qmd'}
+```
+
+```{r, eval = TRUE, echo=FALSE, child = '02_intu_2_globetossing.qmd'}
+```
+
+```{r, eval = TRUE, echo=FALSE, child = '02_intu_3_randomslopes.qmd'}
+```
+
+```{r, eval = TRUE, echo=FALSE, child = '02_intu_4_shiny.qmd'}
+```
+
+```{r, eval = TRUE, echo=FALSE, child = '04_first_stan.qmd'}
+```
+
+```{r, eval = TRUE, echo=FALSE, child = '05_shining.qmd'}
+```
+
+
+
+
+<!-- ## interactive -->
+<!-- <iframe id="shiny" src="https://gobbios.shinyapps.io/posterior_demo/" style="border: none; width: 450%; height: 100%" frameborder="0"></iframe> -->
+
+
+
+
+## references

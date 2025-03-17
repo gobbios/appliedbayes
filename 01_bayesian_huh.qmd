@@ -1,0 +1,157 @@
+<!-- # Bayesian, huh? {background-image="resources/images/better-git-it.png" background-size="50%" background-position="bottom right"} -->
+
+# Bayesian, huh? {background-image="resources/images/vince.gif" background-size="50%" background-position="bottom right"}
+
+## primer: science before statistics
+
+- doing statistical modelling requires a **scientific model** and knowledge about how the data were collected
+
+. . .
+
+- the reason for doing statistics and the design of a statistical model cannot be found in or extracted from the observed data
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">
+@mcelreath2020
+</div>
+
+## Bayesian in nutshell?
+
+- update your state of knowledge using observed data
+
+$$
+\overbrace{p(\theta \mid \textrm{data})}^{\text{Posterior}} =
+\frac{\overbrace{p(\textrm{data} \mid \theta)}^{\text{Likelihood}} \times \overbrace{p(\theta)}^{\text{Prior}}}
+{\underbrace{p(\textrm{data})}_{\text{(Normalizing constant)}}}
+$$
+
+. . .
+
+::: {style="font-size: 0.8em"}
+- $\theta$ is short for the set of parameters we estimate (e.g. intercept, slope(s) and error)
+- we ignore the denominator - it's foremost and "only" a normalizing constant...
+:::
+
+
+## Bayesian vs. frequentist
+
+- the key difference, philosophical speaking, between frequentist and Bayesian approaches is:
+
+  - frequentist: parameters are fixed, data vary ("if I repeated this experiment indefinetly")
+  
+    - $p(\text{data}|\theta)$
+  
+  - Bayesian: parameters vary (they are variables with distributions), data are fixed
+  
+    - $p(\theta|\text{data})$
+
+- a lot of the machinery is the same!!!
+
+## frequentist **confidence interval**
+
+:::{.columns}
+
+::: {.column width="70%" .incremental}
+> if we were to repeatedly take many(!) random samples about X% of those computed intervals would contain the true parameter
+:::
+
+::: {.column width="30%"}
+
+```{r, fig.align='right', out.width='100%'}
+knitr::include_graphics("resources/images/meme-pvalue.jpg")
+```
+
+:::
+:::
+
+. . .
+
+- for a specific interval we cannot say there is a X% probability that it contains the parameter value  
+
+. . .
+
+- there is no distributional quality to a CI
+
+. . .
+
+- the parameter value is a single value, a point estimate
+
+
+## Bayesian **credible interval**
+
+
+> given the observed data, there is a X% probability that the true parameter lies within the computed interval
+
+
+. . .
+
+- isn't this nice?
+
+. . .
+
+- the estimated parameter is a distribution
+
+
+## how do we estimate things?
+
+::: {style="font-size: 0.9em" .incremental}
+
+- it's about estimating parameters, not about formal hypothesis testing
+
+- if we just test silly null hypotheses with `brms` instead of `lme4` we have gained nothing...
+
+- maximum likelihood vs. obtaining posterior distributions
+
+- ML: `lme4`, `glmmTMB`
+
+- Bayesian: Stan 
+  - formula syntax R interfaces: `brms`, `rstanarm`, (`rethinking`)
+  - interact with Stan directly from R: `cmdstanr`, `rstan`
+
+- (also PyMC3, Julia, BUGS, JAGS, ...)
+:::
+
+
+# workflow {background-image="resources/images/fence.png" background-size="50%" background-position="bottom right"}
+
+## key components (a selection)
+
+- prior predictive checks
+
+- posterior predictive checks
+
+- (prior elicitation)
+
+- (model comparison)
+
+- (sensitivity analysis)
+
+- (simulation-based calibration)
+
+- (hypothesis testing)
+
+::: {.notes}
+as with frequentist approaches, a lot of these checks require subjective judgments
+:::
+
+## prior predictive checks
+:::{.incremental}
+- understand implications of priors through simulation  
+  - simulate data from prior distribution(s)
+  - do resulting data look plausible
+- there are no correct priors, only scientifically justifiable priors
+- simulate, understand
+:::
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@mcelreath2020; @vandeschoot2021</div>
+
+
+## posterior predictive checks
+:::{.incremental}
+> If a model is a good fit we should be able to use it to generate data that resemble the data that we observed.^[@gabry2019]
+
+- use actual posteriors to generate new response values
+- compare features of the simulated responses to observed 
+  - distribution shape
+  - summary statistic
+
+:::

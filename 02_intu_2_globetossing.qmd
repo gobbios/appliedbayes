@@ -1,0 +1,193 @@
+
+
+```{r globetoss, fig.width=4, fig.height=3, include=FALSE, fig.path="figures/"}
+par(mgp = c(1.1, 0.35, 0), mar = c(2.5, 2.5, 1, 1), family = "serif", tcl = -0.2, las = 1)
+par(bg = NA)
+
+bplot <- function() {
+  plot(0, 0, xlim = c(0, 1), xaxs = "i", type = "n", ylim = c(0, 1.5), yaxs = "i", axes = FALSE, ylab = "plausibility", xlab = "proportion water")
+  axis(1)  
+  box()
+}
+textfoo <- function(upto) {
+  mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W"), at = seq(0.05, 0.95, length.out = 9), col = "grey")
+  mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W")[1:upto], at = seq(0.05, 0.95, length.out = 9)[1:upto], col = "black")
+}
+
+
+xvals <- seq(0, 1, by = 0.01)
+
+# 1
+bplot()
+textfoo(1)
+points(xvals, dbeta(xvals, 1, 1)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 2, 1)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 2
+bplot()
+textfoo(2)
+points(xvals, dbeta(xvals, 2, 1)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 2, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 3
+bplot()
+textfoo(3)
+points(xvals, dbeta(xvals, 2, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 3, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 4
+bplot()
+textfoo(4)
+points(xvals, dbeta(xvals, 3, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 4, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 5
+bplot()
+textfoo(5)
+points(xvals, dbeta(xvals, 4, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 5, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 6
+bplot()
+textfoo(6)
+points(xvals, dbeta(xvals, 5, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 5, 3)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 7
+bplot()
+textfoo(7)
+points(xvals, dbeta(xvals, 5, 3)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 6, 3)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 8
+bplot()
+textfoo(8)
+points(xvals, dbeta(xvals, 6, 3)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 6, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 9
+bplot()
+textfoo(9)
+points(xvals, dbeta(xvals, 6, 4)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 7, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+```
+
+# intuitions, part 2 {background-image="resources/images/goat.png" background-size="50%" background-position="bottom right"}
+
+## ~~throwing a coin~~tossing the globe
+
+- update our knowldege as new data comes in
+
+- trying to estimate proportion of surface on earth that is water 
+
+- toss a globe, catch it, does your right index finger touch water or land?
+
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@mcelreath2020</div>
+
+## tossing the globe
+
+::: {.r-stack}
+
+![](figures/globetoss-1.png){.fragment .fade-in-then-out data-fragment-index=1}
+
+![](figures/globetoss-2.png){.fragment .fade-in-then-out data-fragment-index=2}
+
+![](figures/globetoss-3.png){.fragment .fade-in-then-out data-fragment-index=3}
+
+![](figures/globetoss-4.png){.fragment .fade-in-then-out data-fragment-index=4}
+
+![](figures/globetoss-5.png){.fragment .fade-in-then-out data-fragment-index=5}
+
+![](figures/globetoss-6.png){.fragment .fade-in-then-out data-fragment-index=6}
+
+![](figures/globetoss-7.png){.fragment .fade-in-then-out data-fragment-index=7}
+
+![](figures/globetoss-8.png){.fragment .fade-in-then-out data-fragment-index=8}
+
+![](figures/globetoss-9.png){.fragment .fade-in-then-out data-fragment-index=9}
+
+:::
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@mcelreath2020</div>
+
+## tossing the globe
+
+```{r, echo=FALSE, fig.width=8, fig.height=5, fig.align='center'}
+par(mfrow = c(3, 3))
+
+bplot <- function() {
+  plot(0, 0, xlim = c(0, 1), xaxs = "i", type = "n", ylim = c(0, 1.5), yaxs = "i", axes = FALSE, ylab = "plausibility", xlab = "proportion water")
+  axis(1)  
+  box()
+}
+textfoo <- function(upto) {
+  mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W"), at = seq(0.05, 0.95, length.out = 9), col = "grey")
+  mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W")[1:upto], at = seq(0.05, 0.95, length.out = 9)[1:upto], col = "black")
+}
+
+
+xvals <- seq(0, 1, by = 0.01)
+
+# 1
+bplot()
+textfoo(1)
+points(xvals, dbeta(xvals, 1, 1)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 2, 1)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 2
+bplot()
+textfoo(2)
+points(xvals, dbeta(xvals, 2, 1)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 2, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 3
+bplot()
+textfoo(3)
+points(xvals, dbeta(xvals, 2, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 3, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 4
+bplot()
+textfoo(4)
+points(xvals, dbeta(xvals, 3, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 4, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 5
+bplot()
+textfoo(5)
+points(xvals, dbeta(xvals, 4, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 5, 2)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 6
+bplot()
+textfoo(6)
+points(xvals, dbeta(xvals, 5, 2)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 5, 3)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 7
+bplot()
+textfoo(7)
+points(xvals, dbeta(xvals, 5, 3)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 6, 3)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 8
+bplot()
+textfoo(8)
+points(xvals, dbeta(xvals, 6, 3)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 6, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+# 9
+bplot()
+textfoo(9)
+points(xvals, dbeta(xvals, 6, 4)/2, type = "l", lty = 2)
+points(xvals, dbeta(xvals, 7, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+
+
+
+par(mfrow = c(1, 1))
+```
+
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@mcelreath2020</div>

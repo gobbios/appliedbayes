@@ -1,0 +1,250 @@
+# hello Stan {background-image="resources/images/stanulam.png" background-size="50%" background-position="bottom right"}
+
+
+
+
+## a simple model
+
+::: {style="font-size: 0.9em"}
+  - goal: fit pretty close to the simplest Stan model possible
+
+  - a linear model with a continuous predictor
+  
+  - three paremeters to estimate:
+    - intercept
+    - slope
+    - residual standard deviation
+    
+  - let's simulate some data
+:::
+
+## simulate a data set
+
+```{r, echo=TRUE}
+#| code-line-numbers: "1-6|8-12|13-14"
+set.seed(123)
+N <- 200
+predictor <- runif(n = N, min = -5, max = 5)
+the_intercept <- 0.5
+the_slope <- -1.2
+the_sd <- 2.6
+
+response <- numeric(N)
+for (i in 1:N) {
+  lp <- the_intercept + the_slope * predictor[i]
+  response[i] <- rnorm(n = 1, mean = lp, sd = the_sd)
+}
+
+xdata <- data.frame(predictor = predictor, response = response)
+```
+
+
+
+
+## write Stan model
+
+::: {style="font-size: 0.9em"}
+
+```{stan, eval = FALSE, output.var = "mod01", echo = TRUE}
+#| code-line-numbers: "1-5|6-10|11-19"
+data {
+  int<lower=1> N; // number of observations
+  vector[N] y; // the response
+  vector[N] predictor; // the predictor
+}
+parameters {
+  real the_intercept; // declare intercept to be estimated
+  real the_slope; // declare slope to be estimated
+  real<lower=0> standard_dev; // declare SD to be estimated
+}
+model {
+  // very explicit with loop (could be vectorized)
+  for (i in 1:N) {
+    // the 'deterministic' part
+    real lp = the_intercept + the_slope * predictor[i]; 
+    // the distributional part ('stochastic')
+    y[i] ~ normal(lp, standard_dev); 
+  }
+}
+```
+
+:::
+
+```{r, include = FALSE}
+library(cmdstanr)
+```
+
+## preparatory steps
+
+
+:::{.columns}
+
+::: {.column width="60%"  .fragment }
+
+::: {style="font-size: 0.8em"}
+  - compile the model
+
+```{r, eval = TRUE, echo=TRUE}
+library(cmdstanr)
+path <- "stan_files/mod01.stan"
+mod01 <- cmdstan_model(stan_file = path)
+mod01$check_syntax(pedantic = FALSE)
+```
+
+:::
+:::
+
+
+::: {.column width="40%"}
+
+```{r, fig.align='center'}
+knitr::include_graphics("resources/images/onedoesnotsimplystan.jpg")
+```
+
+:::
+:::
+
+
+. . .
+
+::: {style="font-size: 0.8em"}
+  - prepare the data
+    
+    - requires a named list
+  
+    - (names of list items have to match those in Stan file's data block)
+
+```{r, echo=TRUE}
+standat <- list(N = nrow(xdata),
+                y = xdata$response, 
+                predictor = xdata$predictor)
+```
+
+:::
+
+## the magic happens
+
+  - sample from the model 
+
+```{r mod01, echo=TRUE, results='hide'}
+res <- mod01$sample(data = standat, chains = 3, parallel_chains = 3,
+                    refresh = 0, seed = 1, iter_sampling = 427)
+```
+
+. . .
+
+-   extract numeric summary
+
+::: {style="font-size: 0.8em"}
+
+```{r, echo=TRUE, R.options=list(digits = 2)}
+out <- res$summary(variables = c("the_intercept", "the_slope", "standard_dev"))
+out <- data.frame(out)[, c("variable", "median", "q5", "q95", "rhat")]
+```
+
+:::
+
+&nbsp;
+
+```{r, R.options=list(digits = 3)}
+out
+```
+
+
+## extract posteriors
+
+  - plot posteriors 
+
+::: {style="font-size: 0.8em"}
+```{r, echo=TRUE, results='hide', fig.width=8, fig.height=2.8, fig.align='center'}
+post <- res$draws(variables = c("the_intercept", "the_slope", "standard_dev"),
+                  format = "draws_matrix")
+
+par(mfrow = c(1, 3))
+hist(post[, 1], main = "intercept")
+hist(post[, 2], main = "slope")
+hist(post[, 3], main = "SD")
+```
+:::
+
+
+## what about the priors?
+
+::: {style="font-size: 0.8em"}
+
+```{stan, eval = FALSE, output.var = "mod02", echo = TRUE}
+#| code-line-numbers: "16-19"
+data {
+  int<lower=1> N; // number of observations
+  vector[N] y; // the response
+  vector[N] predictor; // the predictor
+}
+parameters {
+  real the_intercept; // declare intercept to be estimated
+  real the_slope; // declare slope to be estimated
+  real<lower=0> standard_dev; // declare SD to be estimated
+}
+model {
+  for (i in 1:N) {
+    real lp = the_intercept + the_slope * predictor[i]; 
+    y[i] ~ normal(lp, standard_dev); 
+  }
+  // priors
+  the_intercept ~ normal(0, 1);
+  the_slope ~ normal(0, 1);
+  standard_dev ~ exponential(1);
+}
+```
+
+:::
+
+## if you can('t)
+
+  - simulate the data, you can('t) model the data...
+
+::: {.fragment .incremental}
+```{r, eval = FALSE, echo=TRUE}
+for (i in 1:N) {
+  lp <- the_intercept + the_slope * predictor[i]
+  response[i] <- rnorm(n = 1, mean = lp, sd = the_sd)
+}
+```
+
+
+&nbsp;
+
+
+```{stan, eval = FALSE, output.var = "mod03", echo = TRUE}
+model {
+  for (i in 1:N) {
+    real lp = the_intercept + the_slope * predictor[i]; 
+    y[i] ~ normal(lp, standard_dev); 
+  }
+}
+```
+
+:::
+
+. . .
+
+- try to recreate the data generating process
+
+
+## hidden details
+
+- a lot is hidden when using high level interfaces ...
+  - residual term?
+  - link function?
+  - blups?
+
+```{r, echo=TRUE, eval=FALSE}
+lm(y ~ predictor)
+lmer(y ~ predictor|id)
+brm(y ~ predictor)
+glmer(y ~ predictor + offset(log(obseff)))
+```
+
+
+:::{.notes}
+and i like that it's so verbose and explicit!!!
+:::
