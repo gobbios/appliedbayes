@@ -27,4 +27,10 @@ library(shiny)
 runApp("path/to/my/documents/app.R")
 ```
 
+# Recommended text books
+
+Richard McElreath: [Statistical Rethinking](https://doi.org/10.1201/9780429029608)
+
+Ben Lambert: [A Student's Guide to Bayesian Statistics](https://uk.sagepub.com/en-gb/eur/book/student’s-guide-bayesian-statistics)
+
 
