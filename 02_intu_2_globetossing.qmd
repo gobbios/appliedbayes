@@ -74,7 +74,7 @@ points(xvals, dbeta(xvals, 7, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 
 
 # intuitions, part 2 {background-image="resources/images/goat.png" background-size="50%" background-position="bottom right"}
 
-## ~~throwing a coin~~tossing the globe
+## ~~throwing a coin~~ tossing the globe
 
 - update our knowldege as new data comes in
 

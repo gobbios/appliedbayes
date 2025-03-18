@@ -1,4 +1,4 @@
-# prior vs posterior {background-image="resources/images/better-git-it.png" background-size="50%" background-position="bottom right"}
+# intuitions, part 4 {background-image="resources/images/better-git-it.png" background-size="50%" background-position="bottom right"}
 
 ## prior vs posterior
 

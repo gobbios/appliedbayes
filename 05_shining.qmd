@@ -105,3 +105,6 @@ the effect of relationship strength and dominance rank on greetings
 
 - the effort of getting into it is well worth it, I think
 
+. . .
+
+- ~~what can I model?~~ what do I want to model?

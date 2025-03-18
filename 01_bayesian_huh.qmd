@@ -4,14 +4,23 @@
 
 ## primer: science before statistics
 
+
+```{r}
+knitr::include_graphics("resources/images/gould2025.png")
+```
+
+. . .
+
 - doing statistical modelling requires a **scientific model** and knowledge about how the data were collected
 
 . . .
 
 - the reason for doing statistics and the design of a statistical model cannot be found in or extracted from the observed data
 
+
+
 <div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">
-@mcelreath2020
+@mcelreath2020; @gould2025
 </div>
 
 ## Bayesian in nutshell?
@@ -34,6 +43,8 @@ $$
 
 ## Bayesian vs. frequentist
 
+::: {.incremental}
+
 - the key difference, philosophical speaking, between frequentist and Bayesian approaches is:
 
   - frequentist: parameters are fixed, data vary ("if I repeated this experiment indefinetly")
@@ -45,6 +56,8 @@ $$
     - $p(\theta|\text{data})$
 
 - a lot of the machinery is the same!!!
+
+:::
 
 ## frequentist **confidence interval**
 
@@ -147,7 +160,7 @@ as with frequentist approaches, a lot of these checks require subjective judgmen
 
 ## posterior predictive checks
 :::{.incremental}
-> If a model is a good fit we should be able to use it to generate data that resemble the data that we observed.^[@gabry2019]
+> If a model is a good fit we should be able to use it to generate data that resemble the data that we observed.
 
 - use actual posteriors to generate new response values
 - compare features of the simulated responses to observed 
@@ -155,3 +168,5 @@ as with frequentist approaches, a lot of these checks require subjective judgmen
   - summary statistic
 
 :::
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@gabry2019</div>

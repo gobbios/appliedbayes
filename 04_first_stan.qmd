@@ -1,11 +1,8 @@
 # hello Stan {background-image="resources/images/stanulam.png" background-size="50%" background-position="bottom right"}
 
-
-
-
 ## a simple model
 
-::: {style="font-size: 0.9em"}
+::: {style="font-size: 0.9em" .incremental}
   - goal: fit pretty close to the simplest Stan model possible
 
   - a linear model with a continuous predictor

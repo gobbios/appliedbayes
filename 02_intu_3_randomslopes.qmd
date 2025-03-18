@@ -80,12 +80,12 @@ kable_styling(knitr::kable(xdata), font_size = 20)
 - setting priors fairly tight here (for demonstration)
 
 ```{r r, fig.retina=2, fig.width=6, fig.height=3.4, fig.align='center', out.width="90%", fig.dpi=600}
-dplot <- function(pr, po) {
-  xlim <- range(c(range(pr), range(po)))
+dplot <- function(pr, po, xlim = NULL) {
+  if (is.null(xlim)) xlim <- range(c(range(pr), range(po)))
   pr <- density(pr)
   po <- density(po)
   ymax <- max(pr$y, po$y) * 1.05
-  plot(0, 0, xlim = xlim, ylim = c(0, ymax), yaxs = "i", type = "n", xlab = "", ylab = "", axes = FALSE)
+  plot(0, 0, xlim = xlim, ylim = c(0, ymax), xaxs = "i", yaxs = "i", type = "n", xlab = "", ylab = "", axes = FALSE)
   axis(1)
   polygon(pr, col = grey(0.5, 0.5), lwd = 2)
   polygon(po, col = adjustcolor("gold", 0.7), lwd = 2)
@@ -106,22 +106,22 @@ title(xlab = "slope", cex.lab = 1.5)
 abline(v = 0.5, col = "red", lwd = 2)
 
 plot(0,0, "n", axes = FALSE, ann = FALSE)
-text(-0.5, 0.3, "prior", col = "darkgrey", adj = 0, font = 2)
-text(-0.5, 0, "posterior", col = "gold", adj = 0, font = 2)
-text(-0.5, -0.3, "true value", col = "red", adj = 0, font = 2)
+text(-0.5, 0.4, "prior", col = "darkgrey", adj = 0, font = 2, cex = 2)
+text(-0.5, 0, "posterior", col = "gold", adj = 0, font = 2, cex = 2)
+text(-0.5, -0.4, "true value", col = "red", adj = 0, font = 2, cex = 2)
 
 xx <- r$draws(c("sds[1]", "sds_prior[1]"), format = "draws_matrix")
-dplot(pr = xx[, 2], po = xx[, 1])
+dplot(pr = xx[, 2], po = xx[, 1], xlim = c(0, 7))
 title(xlab = "SD varying intercepts", cex.lab = 1.5)
 abline(v = 0.5, col = "red", lwd = 2)
 
 xx <- r$draws(c("sds[2]", "sds_prior[2]"), format = "draws_matrix")
-dplot(pr = xx[, 2], po = xx[, 1])
+dplot(pr = xx[, 2], po = xx[, 1], xlim = c(0, 7))
 title(xlab = "SD varying slopes", cex.lab = 1.5)
 abline(v = 1, col = "red", lwd = 2)
 
 xx <- r$draws(c("cor_val", "cor_prior"), format = "draws_matrix")
-dplot(pr = xx[, 2], po = xx[, 1])
+dplot(pr = xx[, 2], po = xx[, 1], xlim = c(-1, 1))
 title(xlab = "correlation", cex.lab = 1.5)
 abline(v = 0.6, col = "red", lwd = 2)
 ```

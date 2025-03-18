@@ -5,3 +5,6 @@
 *.html
 .DS_Store
 00_main_files/
+dump/
+figures/
+test.qmd

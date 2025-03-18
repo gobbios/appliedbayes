@@ -82,3 +82,7 @@ m = "#3B99B1"
 
 
 ## references
+
+::: {#refs style="font-size: 0.5em"}
+
+:::

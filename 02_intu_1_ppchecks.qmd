@@ -57,8 +57,9 @@ for (i in 1:50) {
 
 
 ::: {.fragment fragment-index=1 .incremental style="font-size: 0.8em"}
-- emulate a frequentist model, equivalent to
-  - pretending we have no clue what values parameters have
+- emulate a frequentist model
+
+- equivalent to pretending we have no clue what values parameters have, with flat priors
   - intercept flat (normal(mean = 0, sd = 20))
   - slope flat (normal(mean = 0, sd = 20))
 :::
@@ -260,6 +261,9 @@ knitr::include_graphics("figures/prior_check1_withdata2-1.png")
 - do it by 'random effect level', by sex, by age class, ....
 :::
 
+
+. . .
+
 ```{r}
 post <- r$draws("noffspring_rep", format = "draws_matrix")
 ```
@@ -304,7 +308,9 @@ par(mfrow = c(1, 1), mar = o)
 
 ## posterior simulations and checks
 
-> Choosing good summary statistics is more an art than a science.^[@schad2021]
+:::{.incremental}
+
+> Choosing good summary statistics is more an art than a science.
 
 - use any test statistic we desire
 
@@ -312,7 +318,12 @@ par(mfrow = c(1, 1), mar = o)
 
   - our model would be bad if it habitually predicted offspring numbers in the 100's or beyond
   
-  - others: range, min, mean
+- others: range, min, mean, anything really
+
+:::
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@schad2021</div>
+
 
 ## posterior simulations and checks
 
@@ -324,7 +335,8 @@ par(mfrow = c(1, 1), mar = o)
 ```{r, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600}
 
 myhist(apply(post, 1, max), range = 0:10, ylim = c(0, 2100))
-title(xlab = "n offspring (max per draw)", ylab = "frequency")
+title(xlab = "n offspring (max per draw)")
+# title(ylab = "frequency", line = 2)
 abline(v = 1, lwd = 2, col = 'red')
 
 ```
@@ -365,5 +377,42 @@ points(xvals, exp(median(b0) + median(b1) * xvals), type = "l", lwd = 3, lty = 2
 :::
 :::
 :::
+
+
+
+## posterior checks with dominance ratings
+
+```{r baboonelo, fig.width=12, fig.height=4.7, include=FALSE, cache=TRUE, fig.path="figures/"}
+library(EloRating.Bayes)
+data("baboons2", package = "EloRating")
+s <- EloRating.Bayes::prep_seq(winner = baboons2$Winner, loser = baboons2$Loser, Date = baboons2$Date)
+r <- elo_seq_bayes(s, parallel_chains = 2, chains = 2, refresh = 100, 
+                   iter_sampling = 500, iter_warmup = 500, seed = 1)
+
+layout(mat = matrix(c(1, 2), ncol = 2, byrow = TRUE), widths = c(1, 2))
+plot_scores_longitudinal(r)
+opars <- par(no.readonly = TRUE)
+par(mar = c(2.5, 2.5, 2, 1))
+pp_check(r, n_samples = 100)
+par(opars)
+```
+
+::: {style="font-size: 0.8em"}
+
+- most methods to obtain dominance ranks in animals are non-parametric
+
+- Elo-rating estimates parameters -> allows predictive simulations
+
+:::
+
+. . .
+
+```{r, fig.align='center'}
+knitr::include_graphics("figures/baboonelo-1.png")
+```
+
+
+<div style="font-size: 0.3em; position: absolute; bottom: 0; right: 0;">@franz2015a; @goffe2018; @neumann2023;  [github.com/gobbios/EloRating.Bayes](https://github.com/gobbios/EloRating.Bayes)</div>
+
 
 
