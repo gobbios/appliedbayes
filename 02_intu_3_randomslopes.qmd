@@ -59,7 +59,7 @@ kable_styling(knitr::kable(xdata), font_size = 20)
 
 ::: {.column width="50%"}
 
-::: {.fragment .incremental}
+::: {.fragment .incremental style="font-size: 0.7em"}
 
 - `lme4` won't even try
 

@@ -23,9 +23,9 @@ knitr::include_graphics("resources/images/gould2025.png")
 @mcelreath2020; @gould2025
 </div>
 
-## Bayesian in nutshell?
+## Bayesian in nutshell
 
-- update your state of knowledge using observed data
+- update our state of knowledge using observed data
 
 $$
 \overbrace{p(\theta \mid \textrm{data})}^{\text{Posterior}} =
@@ -36,7 +36,7 @@ $$
 . . .
 
 ::: {style="font-size: 0.8em"}
-- $\theta$ is short for the set of parameters we estimate (e.g. intercept, slope(s) and error)
+- $\theta$ is short for the set of parameters we estimate (e.g. intercept, slope(s), correlations, dispersion, variance)
 - we ignore the denominator - it's foremost and "only" a normalizing constant...
 :::
 
@@ -103,6 +103,71 @@ knitr::include_graphics("resources/images/meme-pvalue.jpg")
 
 - the estimated parameter is a distribution
 
+## distributions vs point estimates
+
+
+::: {style="font-size: 0.8em" .fragment fragment-index=1}
+<!-- - a bullet point (index = 3) -->
+:::
+
+:::{.columns}
+
+::: {.column width="50%" .fragment fragment-index=1}
+::: {style="font-size: 0.4em" .fragment fragment-index=1}
+```{r, fig.width=4, fig.height=2.3}
+plot(0, 0, "n", xlim = c(0, 1), ylim = c(0, 3), yaxs = "i", xlab = "estimated proportion", ylab = "density", xaxs = "i", axes = FALSE)
+axis(1)
+
+xvals <- seq(0, 1, length.out = 101)
+polygon(c(rev(xvals), xvals), c(rep(0, length(xvals)), dbeta(x = xvals, 7, 4)), col = "darkblue")
+# dbeta(x = xvals, 7, 4) is post when prior is flat (beta(1, 1)) 7 = 6+1, 4 = 3+1
+# polygon(c(rev(xvals), xvals), c(rep(0, length(xvals)), dbeta(x = xvals, 1, 1)), col = "darkred")
+```
+:::
+::: {style="font-size: 0.8em" .fragment fragment-index=1}
+Bayesian posterior **distribution**
+:::
+:::
+
+::: {.column width="50%" .fragment fragment-index=2}
+
+
+::: {style="font-size: 0.4em" .fragment fragment-index=1}
+
+
+```{r, fig.width=4, fig.height=2.3}
+heads <- 6
+flips <- 9
+theta_hat <- heads / flips
+
+se <- sqrt(theta_hat * (1 - theta_hat) / flips)
+ci_lower <- theta_hat - 1.96 * se
+ci_upper <- theta_hat + 1.96 * se
+
+plot(0, 0, "n", xlim = c(0, 1), ylim = c(0, 3), yaxs = "i", xlab = "estimated proportion", ylab = "", xaxs = "i", axes = FALSE)
+segments(x0 = ci_lower, y0 = 1.5, x1 = ci_upper, y1 = 1.5, lwd = 2, col = "darkblue")
+points(6 / 9, 1.5, pch = 21, bg = "darkblue", cex = 2.2)
+axis(1)
+```
+
+:::
+
+
+::: {style="font-size: 0.8em" .fragment fragment-index=2}
+frequentist **point estimate** with confidence interval
+:::
+
+
+:::
+
+:::
+
+::: {style="font-size: 1em" .fragment fragment-index=1}
+<!-- - a last point (index = 1) -->
+:::
+
+
+
 
 ## how do we estimate things?
 
@@ -120,7 +185,7 @@ knitr::include_graphics("resources/images/meme-pvalue.jpg")
   - formula syntax R interfaces: `brms`, `rstanarm`, (`rethinking`)
   - interact with Stan directly from R: `cmdstanr`, `rstan`
 
-- (also PyMC3, Julia, BUGS, JAGS, ...)
+- (also PyMC3, Julia, BUGS, JAGS, JAX, ...)
 :::
 
 
@@ -151,7 +216,7 @@ as with frequentist approaches, a lot of these checks require subjective judgmen
 - understand implications of priors through simulation  
   - simulate data from prior distribution(s)
   - do resulting data look plausible
-- there are no correct priors, only scientifically justifiable priors
+- there are no *correct* priors, only scientifically justifiable priors
 - simulate, understand
 :::
 

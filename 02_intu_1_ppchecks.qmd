@@ -8,6 +8,25 @@ editor_options:
 
 ## a funky example
 
+
+::: {style="font-size: 0.8em" .incremental}
+
+- goal: estimate the relationship between age and number of offspring 
+
+- study species: a hypothetical primate species
+
+  - more than one offspring per year is rare
+
+- we assume the relationship is linear[^fgfgfg]
+::: 
+
+
+
+[^fgfgfg]: spoiler: it isn't
+
+## a funky example - the data
+
+
 ```{r, results='hide'}
 # xdata <- read.csv("intu2.csv")
 set.seed(21293)
@@ -20,27 +39,48 @@ y <- rpois(n, exp(mu + ageeff * predvals))
 ```
 
 
-::: {style="font-size: 0.8em"}
-
-- goal: estimate the relationship between age and number of offspring 
-
-::: 
-. . .
-
-::: {style="font-size: 0.8em"}
-- our data:
-
 ```{r}
-knitr::kable(xdata)
+knitr::kable(data.frame(age = predvals, offspring = y))
 ```
 
-:::
-
 . . .
 
-::: {style="font-size: 0.8em"}
-- in case you wondered: the minimum sample size in the Bayesian world is 1
+::: {style="font-size: 0.8em" }
+- small sample you say?[^iufdgdg]
 :::
+
+
+[^iufdgdg]: the minimum sample size in the Bayesian world is ~~1~~0
+
+<!-- , oh wait no it's -->
+
+## prior predictive simulation
+
+```{r flat_prior, fig.width=4, fig.height=2.3, fig.align='center', out.width="75%", fig.dpi=600, include=FALSE, fig.path="figures/"}
+set.seed(1)
+par(yaxs = "i", xaxs = "i")
+plot(0, 0, xlim = c(-20, 20), ylim = c(0, 0.025), type = "n", xlab = "parameter value (intercept or slope)", ylab = "density", cex.axis = 0.8, axes = FALSE)
+axis(1)
+# segments(-50, 0, 50, 0)
+xseq <- seq(-20, 20, by = 0.1)
+points(xseq, dnorm(xseq, 0, 20), type = "l", lwd = 5)
+```
+
+::: {.fragment fragment-index=1 .incremental style="font-size: 0.8em"}
+- emulate a frequentist model
+
+- equivalent to pretending we have no clue what values parameters have, with uninformative (*flat*) prior distributions
+  - intercept: `normal(mean = 0, sd = 20)`
+  - slope: `normal(mean = 0, sd = 20)`
+:::
+
+
+::: {.fragment fragment-index=2 .incremental style="font-size: 0.8em"}
+
+![](figures/flat_prior-1.png){.fragment width=50% fig-align="center"}
+
+:::
+
 
 
 ## prior predictive simulation
@@ -54,39 +94,30 @@ for (i in 1:50) {
 }
 ```
 
-
-
-::: {.fragment fragment-index=1 .incremental style="font-size: 0.8em"}
-- emulate a frequentist model
-
-- equivalent to pretending we have no clue what values parameters have, with flat priors
-  - intercept flat (normal(mean = 0, sd = 20))
-  - slope flat (normal(mean = 0, sd = 20))
-:::
-
-
 :::{.columns}
-::: {.column width="60%" .fragment fragment-index=2}
+::: {.column width="50%" .fragment fragment-index=2}
 ![](figures/prior_check_1-1.png){.fragment}
 :::
 
-::: {.column width="40%" .fragment}
-&nbsp;
+::: {.column width="50%" .incremental .fragment style="font-size: 0.8em"}
 
 - plausible?
+
+- many predictions are so outrageous, they didn't even show in the plotting range
+
+- (doesn't require observed data)
 :::
 :::
 
 
 ## prior versus posterior
 
-- even so, we can learn things (update our state of knowledge)
+- even so, we can learn things (update our state of knowledge, **using data**)
 
 ```{r, results='hide'}
 mi2 <- cmdstanr::cmdstan_model("stan_files/intu2a.stan")  
 d <- list(nobs = nrow(xdata), age = xdata$age, noffspring = xdata$noffspring)
-r <- mi2$sample(data = d,
-                seed = 1, refresh = 0)
+r <- mi2$sample(data = d, seed = 1, refresh = 0)
 post_int <- density(c(r$draws("intercept", format = "draws_matrix")))
 prior_int <- density(c(r$draws("intercept_prior", format = "draws_matrix")))
 post_age <- density(c(r$draws("ageslope", format = "draws_matrix")))
@@ -96,7 +127,7 @@ prior_age <- density(c(r$draws("ageslope_prior", format = "draws_matrix")))
 
 :::{.columns}
 
-::: {.column width="50%"  .fragment}
+::: {.column width="50%" .fragment}
 
 ```{r prior_check1_withdata1, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600, fig.path="figures/"}
 ymax <- max(post_int$y, prior_int$y)
@@ -111,7 +142,7 @@ polygon(prior_int, col = adjustcolor("#808080", 0.5))
 polygon(post_int, col = adjustcolor("#FFD700", 0.5))
 ```
 
-::: {.fragment}
+::: {.fragment style="font-size: 0.8em"}
 - very little support for a positive intercept
 :::
 
@@ -133,7 +164,7 @@ polygon(prior_age, col = adjustcolor("#808080", 0.5))
 polygon(post_age, col = adjustcolor("#F5191C", 0.5))
 ```
 
-::: {.fragment}
+::: {.fragment style="font-size: 0.8em"}
 - positive slope more plausible than a negative slope
 :::
 :::
@@ -147,17 +178,74 @@ polygon(post_age, col = adjustcolor("#F5191C", 0.5))
 . . .
 
 - intercept: 
-  - must be close to observed mean 
+  - must be close to observed mean
+  
 
 . . .
 
 - slope:
   - must be positive
-  - shouldn't allow implausibly large offspring numbers[^gfsghsd]
+  - shouldn't allow implausibly large offspring numbers
 
 . . .
 
-[^gfsghsd]: if we think about females in a generic large primate: more than one offspring year is rare
+
+
+
+
+## prior simulation, 2nd attempt
+
+```{r betterpriors1, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600, include = FALSE,  fig.path="figures/"}
+set.seed(1)
+par(yaxs = "i", xaxs = "i")
+plot(0, 0, xlim = c(-20, 20), ylim = c(0, 0.21), type = "n", xlab = "parameter value (intercept)", ylab = "density", cex.axis = 0.8, axes = FALSE)
+axis(1)
+# segments(-50, 0, 50, 0)
+xseq <- seq(-20, 20, by = 0.1)
+points(xseq, dnorm(xseq, -1.5, 2), type = "l", lwd = 2)
+```
+
+
+```{r betterpriors2, fig.retina=2, fig.width=4, fig.height=2.3, fig.align='center', out.width="90%", fig.dpi=600, include = FALSE, fig.path="figures/"}
+set.seed(1)
+par(yaxs = "i", xaxs = "i")
+plot(0, 0, xlim = c(-20, 20), ylim = c(0, 0.81), type = "n", xlab = "parameter value (slope)", ylab = "density", cex.axis = 0.8, axes = FALSE)
+axis(1)
+# segments(-50, 0, 50, 0)
+xseq <- seq(-20, 20, by = 0.1)
+points(xseq, dnorm(xseq, 0.5, 0.5), type = "l", lwd = 2)
+
+```
+
+:::{.columns}
+
+::: {.column width="50%" .fragment .incremental style="font-size: 0.8em"}
+
+  - intercept:
+  
+  - `normal(mean = -1.5, sd = 2)`
+
+![](figures/betterpriors1-1.png){.fragment width=100% fig-align="center"}
+
+
+
+
+
+:::
+
+
+::: {.column width="50%" .fragment .incremental style="font-size: 0.8em"}
+
+
+  - slope: 
+  
+  - `normal(mean = 0.5, sd = 0.5)`
+
+![](figures/betterpriors2-1.png){.fragment width=100% fig-align="center"}
+
+:::
+:::
+
 
 
 ## prior simulation, 2nd attempt
@@ -177,6 +265,51 @@ for (i in 1:20) {
 
 - still room for improvement
 
+
+## prior simulation, 2nd attempt
+
+::: {.fragment fragment-index=1}
+- we can also use our data (for the predictor variable), e.g.:
+:::
+
+:::{.columns}
+
+::: {.column width="50%"}
+::: {style="font-size: 0.8em" .fragment fragment-index=2}
+maximum number of offspring?
+:::
+::: {.fragment fragment-index=3}
+
+```{r prior_check_2_withdata_a, fig.width=4, fig.height=2.3, fig.align='center', out.width="65%", fig.dpi=600, fig.path="figures/"}
+set.seed(1)
+ymax <- sapply(seq_len(1000), \(x) max(rpois(nrow(xdata), exp(rnorm(1, -1.5, 2) + rnorm(1, 0.5, 0.5) * xdata$age))))
+hist(ymax, breaks = seq(-0.0000001, max(ymax) + 20.0000001, by = 2), xlim = c(0, 60), yaxs = "i", ylim = c(0, 500),
+     xlab = "max number of offspring", las = 1, main = "", ylab = "frequency")
+box(bty = "l")
+```
+
+:::
+:::
+
+
+::: {.column width="50%"}
+::: {style="font-size: 0.8em" .fragment fragment-index=4}
+proportion without any offspring?
+:::
+::: {.fragment fragment-index=5}
+
+```{r prior_check_2_withdata_b, fig.width=4, fig.height=2.3, fig.align='center', out.width="65%", fig.dpi=600, fig.path="figures/"}
+set.seed(1)
+yprop0 <- sapply(seq_len(1000), \(x) mean(rpois(nrow(xdata), exp(rnorm(1, -1.5, 2) + rnorm(1, 0.5, 0.5) * xdata$age)) == 0))
+barplot(table(yprop0), xlab = "proportion individuals without offspring", ylab = "frequency")
+```
+:::
+:::
+:::
+
+::: {.fragment fragment-index=6}
+- there is no absolute right or wrong: it’s about general plausibility of our prior choice
+:::
 
 
 ## how does the fit look like?

@@ -5,7 +5,7 @@ author:
   name: "Christof Neumann"
   affiliation: "German Primate Center"
   email: christofneumann1@gmail.com
-date: "2025-03-18"
+date: "2025-10-27"
 format: 
   revealjs:
     theme: solarized

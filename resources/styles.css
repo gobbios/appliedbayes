@@ -1,9 +1,8 @@
 .reveal .slide-number {
-  left: 50px !important;  /* Moves the number to the left */
-  bottom: 50px !important;  /* Moves the number to the left */
-  right: auto !important; /* Prevents default right alignment */
-  right: auto !important;   /* Prevents default right alignment */
-  font-size: 1em !important;  /* Increases font size */
+  right: 20px !important;  /* Moves the number to the left */
+  bottom: 13px !important;  /* Moves the number to the left */
+  left: auto !important; /* Prevents default right alignment */
+  font-size: 0.7em !important;  /* Increases font size */
   font-weight: bold;  /* Makes the number stand out */
   font-family: Times New Roman;
 }

@@ -7,7 +7,7 @@
 
   - a linear model with a continuous predictor
   
-  - three paremeters to estimate:
+  - three parameters to estimate:
     - intercept
     - slope
     - residual standard deviation
