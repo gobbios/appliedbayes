@@ -11,7 +11,7 @@ bplot <- function() {
 }
 textfoo <- function(upto) {
   mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W"), at = seq(0.05, 0.95, length.out = 9), col = "grey")
-  mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W")[1:upto], at = seq(0.05, 0.95, length.out = 9)[1:upto], col = "black")
+  if (upto > 0) mtext(c("W", "L", "W", "W", "W", "L", "W", "L", "W")[1:upto], at = seq(0.05, 0.95, length.out = 9)[1:upto], col = "black")
 }
 
 
@@ -70,6 +70,12 @@ bplot()
 textfoo(9)
 points(xvals, dbeta(xvals, 6, 4)/2, type = "l", lty = 2)
 points(xvals, dbeta(xvals, 7, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 2)
+
+
+# 0
+bplot()
+textfoo(0)
+points(xvals, dbeta(xvals, 1, 1)/2, type = "l", lty = 2)
 ```
 
 # intuitions, part 2 {background-image="resources/images/goat.png" background-size="50%" background-position="bottom right"}
@@ -88,24 +94,25 @@ points(xvals, dbeta(xvals, 7, 4)/2, type = "l", lty = 1, col = "#3B99B1", lwd = 
 ## tossing the globe
 
 ::: {.r-stack}
+![](figures/globetoss-10.png){.fragment .fade-in-then-out data-fragment-index=1}
 
-![](figures/globetoss-1.png){.fragment .fade-in-then-out data-fragment-index=1}
+![](figures/globetoss-1.png){.fragment .fade-in-then-out data-fragment-index=2}
 
-![](figures/globetoss-2.png){.fragment .fade-in-then-out data-fragment-index=2}
+![](figures/globetoss-2.png){.fragment .fade-in-then-out data-fragment-index=3}
 
-![](figures/globetoss-3.png){.fragment .fade-in-then-out data-fragment-index=3}
+![](figures/globetoss-3.png){.fragment .fade-in-then-out data-fragment-index=4}
 
-![](figures/globetoss-4.png){.fragment .fade-in-then-out data-fragment-index=4}
+![](figures/globetoss-4.png){.fragment .fade-in-then-out data-fragment-index=5}
 
-![](figures/globetoss-5.png){.fragment .fade-in-then-out data-fragment-index=5}
+![](figures/globetoss-5.png){.fragment .fade-in-then-out data-fragment-index=6}
 
-![](figures/globetoss-6.png){.fragment .fade-in-then-out data-fragment-index=6}
+![](figures/globetoss-6.png){.fragment .fade-in-then-out data-fragment-index=7}
 
-![](figures/globetoss-7.png){.fragment .fade-in-then-out data-fragment-index=7}
+![](figures/globetoss-7.png){.fragment .fade-in-then-out data-fragment-index=8}
 
-![](figures/globetoss-8.png){.fragment .fade-in-then-out data-fragment-index=8}
+![](figures/globetoss-8.png){.fragment .fade-in-then-out data-fragment-index=9}
 
-![](figures/globetoss-9.png){.fragment .fade-in-then-out data-fragment-index=9}
+![](figures/globetoss-9.png){.fragment .fade-in-then-out data-fragment-index=10}
 
 :::
 

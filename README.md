@@ -2,17 +2,17 @@
 
 If you want to recreate the slides you will need
 
-- [`quarto`](https://quarto.org)
+- [`quarto`](https://quarto.org/docs/get-started)
 
-- [`Stan`](https://mc-stan.org)
+- [`Stan`](https://mc-stan.org/install)
 
-- `R` packages from CRAN: `knitr`, `kableExtra`
+- `R` packages from CRAN: `knitr`, `kableExtra`, `shiny` (optional)
 
 - `R` packages from GitHub: [`cmdstanr`](https://github.com/stan-dev/cmdstanr), [`EloRating.Bayes`](https://github.com/gobbios/EloRating.Bayes)
 
-- for the optional `shiny` app, you will also need, well, `shiny`
+- for the optional `shiny` app, you will also need, well, `shiny` (i.e., the R package)
 
-To render, download or clone the repository and then in the command line do:
+To render the presentation, download or clone the repository and then in the command line do:
 
 ```
 quarto preview 00_main.qmd --to revealjs --presentation --no-watch-inputs --no-browse

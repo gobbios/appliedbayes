@@ -15,7 +15,7 @@
   - let's simulate some data
 :::
 
-## simulate a data set
+## simulate a data set in R
 
 ```{r, echo=TRUE}
 #| code-line-numbers: "1-6|8-12|13-14"
@@ -79,7 +79,7 @@ library(cmdstanr)
 ::: {.column width="60%"  .fragment }
 
 ::: {style="font-size: 0.8em"}
-  - compile the model
+  - compile the model in R using `cmdstanr`
 
 ```{r, eval = TRUE, echo=TRUE}
 library(cmdstanr)
@@ -121,16 +121,20 @@ standat <- list(N = nrow(xdata),
 
 ## the magic happens
 
-  - sample from the model 
+- sample from the model 
+
+::: {style="font-size: 0.8em"}
 
 ```{r mod01, echo=TRUE, results='hide'}
 res <- mod01$sample(data = standat, chains = 3, parallel_chains = 3,
                     refresh = 0, seed = 1, iter_sampling = 427)
 ```
 
+:::
+
 . . .
 
--   extract numeric summary
+- extract numeric summary
 
 ::: {style="font-size: 0.8em"}
 
